@@ -2,44 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="css/chat.css">
-    <link rel="stylesheet" href="css/login.css">
-
-    
-  
-
-
-
-    
 </head>
-<body class="body">
-    <header><h1>Instant chat</h1></header>
-   <main class="main">
-    
-    <section id="login">
-    
-       
-      
-    <div class="cote">
-        <div class="cote_gauche">
-           
-          <img src="image/back.jpg" class="chatting" alt="">
-        </div>
-        <div id="sign_in">
-            <img src="image/icons8-utilisateur-96.png" class="user_icon" alt="">
-            <form action="" >
-                <div id="Uname"> <label for="">Your name:</label> <input type="text" id="name"></div>
-                <div id="room"><label for="">Room:</label> <input type="text" id="room_name" placeholder="Global&#x1F30D;"> </div>
-            </form>
-            <button id="join">join</button>
-            <div class="txt">if you don't choose a room you'll be redirected to the global room</div>
-        </div>
-        
-    </div>
-    </section>
+<body>
+
     <section class="app"  >
         <button id="mode"><img src="image/icons8-lune-91.png" alt=""></button>
         
@@ -58,13 +26,13 @@
             </div>
             <div class="description">
                 <div class="members">
-                    <h2>member</h2>
+                    <h2>members</h2>
                 <div id="all_users">
                   
                 
                    
                 </div>
-                 </div> 
+                 </div>
                 <div id="leave"><img src="image/icons8-sortie-90.png" class="leave_icon" alt=""></div>
                 
             </div>
@@ -77,12 +45,10 @@
            
         </div>
     </section>
-   </main>
-   <script src="/socket.io/socket.io.js"></script>
-   <script src="chat.js"></script>  
-   <script src="emoji/emoji.js"></script>
-   <script src="emoji/em.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
 
+    <script src="chat.js"></script>  
+    <script src="emoji/emoji.js"></script>
+    <script src="emoji/em.js"></script>
 </body>
-
 </html>

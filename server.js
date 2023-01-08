@@ -11,7 +11,7 @@ const pool=new Pool({
     port:5432,
     database:'chat',
     user:'postgres',
-    password:'motdepasse'
+    password:'postgres'
 });
 //current date
 const today = new Date();
