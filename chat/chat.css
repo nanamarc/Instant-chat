@@ -1,0 +1,108 @@
+*{
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+
+}
+#app{
+    background-color:rgba(224, 111, 13, 0.922);
+    height: 100vh;
+    display: none;
+    
+}
+.cont{
+    width: 100%;
+  
+    height: 92%;
+    display: flex;
+    flex-direction: row;
+
+}
+.description{
+    width: 40%;
+  
+}
+#app h1{
+    text-align: center;
+}
+#container{
+    border: black solid 2px;
+    width: 80%;
+    margin: 0 auto;
+    height: 55vh;
+    border-radius: 15px;
+    background-color: white;
+    
+}
+#message_container{
+    width: 65%;
+    border: solid black 2px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+#app input{
+    width: 85%;
+    border-radius: 15px;
+    margin-top: 4px;
+    height: 30px;
+}
+.send{
+    margin-bottom: 50px;
+    width: 40px;
+    height: 38px;
+}
+
+.text{
+    margin: 3px 0;
+    width: 65%;
+    height: 30px;
+   display: flex;
+   flex-direction: row;
+  gap: 10px;
+  
+}
+.text button{
+    background-color: transparent;
+    border: none;
+}
+.msg{
+    margin: 5px 0;
+}
+
+.sending{
+   width: fit-content;
+max-width: 200px;
+    padding: 10px;
+    word-wrap: break-word;
+  /*border: black solid 2px;*/
+color: white;
+  border-radius: 10px;
+}
+.other_message .sending{
+background-color: gray;
+}
+.my_message .sending{
+    background-color: rgb(8, 98, 253);
+}
+
+.my_message{
+    margin-left: 70%;
+}
+.other_message{
+    margin-left: 10%;
+}
+#update{
+    text-align: center;
+}
+.emoji{
+    margin-top: 4px;
+    width: 35px;
+    height: 35px;
+    background-color: yellow;
+    border-radius: 100%;
+   
+}
+.leave{
+    margin-top: 15px;
+}

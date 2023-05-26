@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="chat.css">
+    
+  
+
+
+
+    
+</head>
+<body>
+   <main>
+    
+    <section id="login">
+    
+        <h1>Insstant chat</h1>
+ 
+        <div id="sign_in">
+            <form action="">
+                <div id="Uname"> <label for="">Your name:</label> <input type="text" id="name"></div>
+                <div id="room"><label for="">Room:</label> <input type="text" id="room_name"> </div>
+            </form>
+            <button id="join">join</button>
+        </div>
+    </section>
+    <section id="app">
+        <h1>Instant chat</h1>
+      
+        <div id="container">
+         <div class="cont">
+            <div id="message_container">
+                <!--<div class="my_message msg">
+                    <div class="sender_name"></div>
+                    <div class="sending"></div>
+                </div>-->
+                <div id="update"></div>
+                <!--<div class="other_message msg">
+                    <div class="sender_name"></div>
+                    <div class="sending"></div>
+                </div>-->
+
+            </div>
+            <div class="description">welcome world
+                <div id="leave">leave</div>
+            </div>
+        </div> 
+            <form action="" class="text" id="form">
+                <input type="text" id="txt">
+                <img src="image/smiley.png" class="emoji" alt="">
+                <button ><img src="image/send.png" class="send" id="send_button" alt=""></button>
+            </form>
+           
+        </div>
+    </section>
+   </main>
+   <script src="/socket.io/socket.io.js"></script>
+   <script src="chat.js"></script>  
+   <script src="emoj/emoji.js"></script>
+   <script src="em.js"></script>
+
+</body>
+
+</html>
