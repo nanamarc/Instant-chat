@@ -2,50 +2,73 @@
     margin: 0;
     padding: 0;
     text-decoration: none;
-
+font-family: Arial, Helvetica, sans-serif;
 }
-#app{
-    background-color:rgba(224, 111, 13, 0.922);
+#room_cont{
+    height: 40px;
+    font-size: 25px;
+    padding-left: 15px;
+    border-bottom: rgb(199, 195, 195) solid 2px;
+    width: 64%;
+}
+.app{
+    background:linear-gradient(120deg, rgb(45, 139, 158),rgb(7, 187, 187));
+
     height: 100vh;
     display: none;
     
 }
 .cont{
     width: 100%;
-  
-    height: 92%;
+/*  border: black solid 2px;*/
+    height: 80%;
     display: flex;
     flex-direction: row;
 
 }
 .description{
-    width: 40%;
-  
+    width: 35%;
+ /* background-color: rgb(231, 224, 224);*/
+    height: 125%;
+   /* border-radius: 15px;*/
+   /* box-shadow: 0px 0px 8px 3px rgba(0, 0, 0, 0.5);*/
+   border-left: 2px solid rgb(199, 195, 195);
+  margin-top: -44px;
 }
-#app h1{
+.app h1{
     text-align: center;
+    font-size: 60px;
+    margin-bottom: 30px;
+    color: white;
 }
 #container{
-    border: black solid 2px;
+ /* border: black solid 2px;*/
     width: 80%;
     margin: 0 auto;
-    height: 55vh;
+    height: 60vh;
     border-radius: 15px;
     background-color: white;
     
 }
 #message_container{
+   /* border: 2px black solid;*/
     width: 65%;
-    border: solid black 2px;
+    border-radius: 15px;
+   /* box-shadow: 2px 2px 6px black;*/
     height: 100%;
     overflow-y: auto;
 }
 
-#app input{
-    width: 85%;
+.app input{
+    outline: none;
+    width: 70%;
     border-radius: 15px;
     margin-top: 4px;
     height: 30px;
+    border: none;
+    background-color: rgb(207, 207, 207);
+    padding-left: 10px;
+    margin-left: 50px;
 }
 .send{
     margin-bottom: 50px;
@@ -83,7 +106,7 @@ color: white;
 background-color: gray;
 }
 .my_message .sending{
-    background-color: rgb(8, 98, 253);
+       background-color:  rgb(22, 165, 193)
 }
 
 .my_message{
@@ -99,10 +122,45 @@ background-color: gray;
     margin-top: 4px;
     width: 35px;
     height: 35px;
-    background-color: yellow;
+    background-color: rgb(22, 165, 193);
     border-radius: 100%;
    
 }
 .leave{
     margin-top: 15px;
+}
+#mode{
+    position: relative;
+    left: 95%;
+    top: 2%;
+  width: 50px;
+  height: 50px;
+  background-color: transparent;
+  border: none;
+ 
+}
+#mode:hover{
+    border: rgb(227, 215, 215) 2px solid;
+    background-color: rgb(221, 210, 210);
+    border-radius: 100%;
+    
+}
+#mode img{
+    width: 40px;
+    height: 40px;
+}
+.sombre{
+    background: linear-gradient(180deg,rgb(148, 143, 143),rgb(54, 53, 53));
+}
+.black{
+    background: linear-gradient(180deg,rgb(16, 16, 16),rgb(16, 16, 16));
+
+}
+#leave img{
+    width: 60px;
+    height: 60px;
+}
+#leave{
+    margin-left: 80%;
+    margin-top: 75%;
 }

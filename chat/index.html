@@ -5,8 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="login.css">
     <link rel="stylesheet" href="chat.css">
+    <link rel="stylesheet" href="login.css">
+
     
   
 
@@ -19,22 +20,35 @@
     
     <section id="login">
     
-        <h1>Insstant chat</h1>
- 
+        <h1 id="instant">Instant chat</h1>
+      
+    <div class="cote">
+        <div class="cote_gauche">
+           
+          <img src="image/back.jpg" class="chatting" alt="">
+        </div>
         <div id="sign_in">
-            <form action="">
+            <img src="image/icons8-utilisateur-96.png" class="user_icon" alt="">
+            <form action="" >
                 <div id="Uname"> <label for="">Your name:</label> <input type="text" id="name"></div>
-                <div id="room"><label for="">Room:</label> <input type="text" id="room_name"> </div>
+                <div id="room"><label for="">Room:</label> <input type="text" id="room_name" placeholder="Global&#x1F30D;"> </div>
             </form>
             <button id="join">join</button>
+            <div class="txt">if you don't choose a room you'll be redirected to the global room</div>
         </div>
+        
+    </div>
     </section>
-    <section id="app">
+    <section class="app"  >
+        <button id="mode"><img src="image/icons8-lune-91.png" alt=""></button>
         <h1>Instant chat</h1>
-      
+       
         <div id="container">
+           <div id="room_cont">Global</div>
          <div class="cont">
+           
             <div id="message_container">
+               
                 <!--<div class="my_message msg">
                     <div class="sender_name"></div>
                     <div class="sending"></div>
@@ -46,14 +60,14 @@
                 </div>-->
 
             </div>
-            <div class="description">welcome world
-                <div id="leave">leave</div>
+            <div class="description">hei
+                <div id="leave"><img src="image/icons8-sortie-90.png" alt=""></div>
             </div>
         </div> 
             <form action="" class="text" id="form">
-                <input type="text" id="txt">
+                <input type="text" id="txt" placeholder="message...">
                 <img src="image/smiley.png" class="emoji" alt="">
-                <button ><img src="image/send.png" class="send" id="send_button" alt=""></button>
+                <button ><img src="image/icons8-envoi-de-courriel-48.png" class="send" id="send_button" alt=""></button>
             </form>
            
         </div>
