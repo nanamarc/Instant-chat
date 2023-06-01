@@ -12,9 +12,24 @@ let use;
 let mess;
 let leave=document.getElementById("leave")
 
+const today=new Date;
+
+//description text
+let text=`you are in the room  and you can talk to all users connected in`
+let i=0;
+function desc(){
+   
+if(i<text.length){
+    texte.innerHTML+=text.charAt(i)
+    i++;
+    setTimeout(desc,200)
+}
+
+}
+desc()
+
 
 //Theme dark and light
-
     var mode=document.getElementById("mode")
 
 mode.addEventListener("click",function(){
@@ -24,13 +39,15 @@ mode.addEventListener("click",function(){
     messageContainer.classList.toggle("sombre")
     join.classList.toggle("sombre")
     if(messageContainer.classList.contains("sombre")){
-        roomCont.style.color="white"
+        messageContainer.style.color="white"
         mode.innerHTML=`<img src="image/soleil.png" alt="">`
-    
+        
+
     }
    
     else{
-        roomCont.style.color="black"
+        messageContainer.style.color="black"
+        /*roomCont.style.color="black"*/
         mode.innerHTML=`<img src="image/icons8-lune-91.png" alt="">`
     }
   
@@ -41,22 +58,33 @@ mode.addEventListener("click",function(){
 
 //joining room
 bouton.addEventListener("click",function(){
+ 
+    let texte=document.getElementById("texte")
     let roomJoined=document.getElementById("room")
   let user={
     username:uname.value,
     room:roomName.value
   }
-  if(user.username=="")
+  let room=document.getElementById("room_cont")
+  if(user.username.trim()=="")
   return;
   socket.emit("login",user);
   join.style.display='none';
   messageContainer.style.display='block';
   roomJoined.innerText=user.room;
+  
   renderMessage("updateOfMine",user.room)
 use=user.username;
+if(user.room!=""){
+    room.innerText=user.room;
+   
+}
+else
+room.innerText="Global"
 
 
 })
+
 //notfy others when an user is typing
 input.addEventListener("focus",function(){
    socket.emit("typing",use)
@@ -74,7 +102,7 @@ form.addEventListener("submit",function(event){
     
     event.preventDefault()
     mess=input.value;
-if(mess){
+if(mess.trim()!=""){
   
    renderMessage("mine",{
     name:use,
@@ -90,7 +118,7 @@ socket.emit("chat",{
 
 
 })
-let userActive=true
+
 function renderMessage(type,msg){
     let containeMessage=document.getElementById("message_container")
     if(type=="mine"){
@@ -100,6 +128,7 @@ function renderMessage(type,msg){
         el.innerHTML=`
         <div class="sender_name">you</div>
         <div class="sending">${msg.text}</div>
+  
         `
         containeMessage.appendChild(el)
     
@@ -123,7 +152,7 @@ function renderMessage(type,msg){
         containeMessage.appendChild(el);
     }
     else if(type=="updateOfMine"){
-        const today=new Date;
+        
         let el=document.createElement("div");
         el.setAttribute("id","update")
         el.innerText=`you have joined the room ${msg} at ${today.getHours()}h:${today.getMinutes()}min`;
@@ -142,10 +171,17 @@ function renderMessage(type,msg){
         el.innerText=msg
         containeMessage.appendChild(el);
     }
+    else if(type="listUsers"){
+        let users=document.getElementById("users")
+        let el=document.createElement("div");
+        el.innerText=msg
+        users.appendChild(el)
+        
+    }
 
-  containeMessage.scrollTop=containeMessage.scrollHeight
+  containeMessage.scrollTop=containeMessage.scrollHeight 
 }
-//leaving room
+//leaving the room
 leave.addEventListener("click",function(){
    socket.emit("leave",use)
     
@@ -170,9 +206,6 @@ socket.on("chat",function(message){
 socket.on("leave",function(urname){
     renderMessage("leave",urname)
 })
-
-
-
 
 
 
