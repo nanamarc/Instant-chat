@@ -14,25 +14,15 @@ let leave=document.getElementById("leave")
 
 const today=new Date;
 
-//description text
-let text=`you are in the room  and you can talk to all users connected in`
-let i=0;
-function desc(){
-   
-if(i<text.length){
-    texte.innerHTML+=text.charAt(i)
-    i++;
-    setTimeout(desc,200)
-}
 
-}
-desc()
+
+
 
 
 //Theme dark and light
-    var mode=document.getElementById("mode")
+   // var mode=document.getElementById("mode")
 
-mode.addEventListener("click",function(){
+/*mode.addEventListener("click",function(){
     var cont=document.getElementById("container");
     var roomCont=document.getElementById("room_cont")
     cont.classList.toggle("black")
@@ -48,12 +38,12 @@ mode.addEventListener("click",function(){
     else{
         messageContainer.style.color="black"
         /*roomCont.style.color="black"*/
-        mode.innerHTML=`<img src="image/icons8-lune-91.png" alt="">`
-    }
+       // mode.innerHTML=`<img src="image/icons8-lune-91.png" alt="">`
+  /*  }
   
 
 
-})
+})*/
 
 
 //joining room
@@ -65,15 +55,16 @@ bouton.addEventListener("click",function(){
     username:uname.value,
     room:roomName.value
   }
+
   let room=document.getElementById("room_cont")
   if(user.username.trim()=="")
   return;
   socket.emit("login",user);
+  
   join.style.display='none';
   messageContainer.style.display='block';
   roomJoined.innerText=user.room;
   
-  renderMessage("updateOfMine",user.room)
 use=user.username;
 if(user.room!=""){
     room.innerText=user.room;
@@ -82,8 +73,9 @@ if(user.room!=""){
 else
 room.innerText="Global"
 
-
+renderMessage("updateOfMine",user.room)
 })
+
 
 //notfy others when an user is typing
 input.addEventListener("focus",function(){
@@ -172,14 +164,25 @@ function renderMessage(type,msg){
         containeMessage.appendChild(el);
     }
     else if(type="listUsers"){
-        let users=document.getElementById("users")
-        let el=document.createElement("div");
-        el.innerText=msg
-        users.appendChild(el)
+        
+       let a=document.createElement("div")
+       a.innerText=msg;
+       users.appendChild(a);
+        
         
     }
+   
 
   containeMessage.scrollTop=containeMessage.scrollHeight 
+}
+function renderUserList(users){
+    let userList=document.getElementById("all_users")
+    userList.innerHTML=""
+    users.forEach(element => {
+       let a=document.createElement("div");
+       a.innerText=element;
+       userList.appendChild(a) 
+    });
 }
 //leaving the room
 leave.addEventListener("click",function(){
@@ -187,7 +190,29 @@ leave.addEventListener("click",function(){
     
     location.href="index.html"
 })
+socket.on("existingMessages",function(message){
+    message.forEach(element=>{
+        if(element.sender_name==use){
+            renderMessage("mine",{
+                name:element.sender_name,
+                text:element.content
+            })
+        }
+        else{
+            renderMessage("other",{
+                name:element.sender_name,
+                text:element.content
+            })
+        }
+       
+    })
+    
+ 
+})
 
+socket.on("userList",function(name){
+   renderUserList(name);
+})
 socket.on("update",function(update){
     renderMessage("update",update);
 })
@@ -198,8 +223,11 @@ socket.on("stopTyping",function(){
 let a=document.querySelector(".type");
 a.remove();
 })
+
+let audio=new Audio('son/son.mp3');
 socket.on("chat",function(message){
     renderMessage("other",message);
+audio.play();
 })
 
 

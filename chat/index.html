@@ -40,7 +40,8 @@
     </div>
     </section>
     <section class="app"  >
-        <button id="mode"><img src="image/icons8-lune-91.png" alt=""></button>
+        <!--<button id="mode"><img src="image/icons8-lune-91.png" alt=""></button>-->
+        <input type="checkbox" class="checkbox">
         <h1>Instant chat</h1>
        
         <div id="container">
@@ -61,8 +62,12 @@
 
             </div>
             <div class="description">
-                <div id="texte">
-                   
+                 <h2>members</h2>
+                <div id="all_users">
+                  
+                   <!--<div class="name">john</div>
+                   <div class="name">soa</div>
+                   <div class="name">koto</div>-->
                 </div>
                 <div id="leave"><img src="image/icons8-sortie-90.png" alt=""></div>
             </div>
@@ -70,6 +75,7 @@
             <form action="" class="text" id="form">
                 <input type="text" id="txt" placeholder="message...">
                 <img src="image/smiley.png" class="emoji" alt="">
+                <input type="file">
                 <button ><img src="image/icons8-envoi-de-courriel-48.png" class="send" id="send_button" alt=""></button>
             </form>
            
@@ -79,7 +85,7 @@
    <script src="/socket.io/socket.io.js"></script>
    <script src="chat.js"></script>  
    <script src="emoj/emoji.js"></script>
-   <script src="em.js"></script>
+   <script src="emoj/em.js"></script>
 
 </body>
 

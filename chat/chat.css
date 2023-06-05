@@ -190,6 +190,19 @@ background-color: gray;
     margin: 0 auto;
     margin-top: 100px;
 }
+
+
+
+/*check*/
+.checkbox {
+background-color: black;
+  }
+  
+  .checkbox:checked {
+   
+    transform: translateX(20%);
+  }
+  
 @media screen and (max-width:700px) {
     .description{
         width: 15%;
