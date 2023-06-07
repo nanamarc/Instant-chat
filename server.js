@@ -42,11 +42,12 @@ socket.on("login",function(data){
 
     io.to(currentRoom).emit("userList",Object.values(userList))
   
-
+    name=username; 
 
 
 //database
-const selectQuery='select sender_name,content from messages where room_name=$1'
+//printing all previous messages
+const selectQuery='select sender_name,content,is_update from messages where room_name=$1'
 const value=[currentRoom]
 pool.query(selectQuery,value,(err,result)=>{
     if(err)
@@ -54,15 +55,30 @@ pool.query(selectQuery,value,(err,result)=>{
     if(result){
         const message=result.rows;
         socket.emit("existingMessages",message);
-        console.log(message)
+        console.log(message);
     }
     
 })
-socket.broadcast.to(currentRoom).emit("update",username+ " has joined room "+currentRoom)
-name=username; 
+
+
     
 
 })
+
+socket.on("update",function(data){
+    socket.broadcast.to(currentRoom).emit("update",data.username+ " has joined room "+currentRoom)
+    const insert='insert into messages(room_name,sender_name,content,is_update) values($1,$2,$3,$4)'
+    const values=[currentRoom,name,'has joined the room',true];
+    pool.query(insert,values,(err,result)=>
+    {
+        if(err)
+        console.log(err)
+        if(result)
+        console.log("enregistré");
+    })
+ 
+})
+
 
 
 //Notify others when an user is typing
@@ -73,6 +89,10 @@ socket.on("typing",function(data){
 
 socket.on("stopTyping",function(){
     socket.broadcast.to(currentRoom).emit("stopTyping")
+})
+//send file
+socket.on("file",function(formData){
+    socket.broadcast.to(currentRoom).emit("file",formData.file)
 })
 // Send message to all connected users
 socket.on("chat",function(message){
@@ -97,13 +117,21 @@ socket.on("leave",function(username){
     io.to(currentRoom).emit("userList",Object.values(userList))
     console.log(username+"has desconnected");
     console.table(userList)
+    const insert='insert into messages(room_name,sender_name,content,is_update) values($1,$2,$3,$4)'
+    const values=[currentRoom,name,"has left the conversation",true];
+    pool.query(insert,values,(err,result)=>{
+        if(err)
+        console.log("erreur:"+err);
+        else 
+        console.log("enregistré");
+    })
  })
 
 
 })
 
 
-let port=862
+let port=876
 server.listen(port,()=>{
     console.log("listen to port"+port)
     

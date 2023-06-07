@@ -55,12 +55,15 @@ bouton.addEventListener("click",function(){
     username:uname.value,
     room:roomName.value
   }
+  
+
 
   let room=document.getElementById("room_cont")
   if(user.username.trim()=="")
   return;
   socket.emit("login",user);
-  
+  socket.emit("update",user)
+  socket.emit("updateList",user);
   join.style.display='none';
   messageContainer.style.display='block';
   roomJoined.innerText=user.room;
@@ -73,7 +76,7 @@ if(user.room!=""){
 else
 room.innerText="Global"
 
-renderMessage("updateOfMine",user.room)
+
 })
 
 
@@ -147,7 +150,7 @@ function renderMessage(type,msg){
         
         let el=document.createElement("div");
         el.setAttribute("id","update")
-        el.innerText=`you have joined the room ${msg} at ${today.getHours()}h:${today.getMinutes()}min`;
+        el.innerText=`you have joined the chat at ${today.getHours()}h:${today.getMinutes()}min`;
         containeMessage.appendChild(el);
     }
 
@@ -179,22 +182,39 @@ function renderUserList(users){
     let userList=document.getElementById("all_users")
     userList.innerHTML=""
     users.forEach(element => {
-       let a=document.createElement("div");
-       a.innerText=element;
-       userList.appendChild(a) 
+       let element=document.createElement("div");
+       element.innerText=element;
+       userList.appendChild(element) 
     });
+   
 }
+
 //leaving the room
 leave.addEventListener("click",function(){
    socket.emit("leave",use)
     
     location.href="index.html"
 })
+//print all previous messages
 socket.on("existingMessages",function(message){
     message.forEach(element=>{
-        if(element.sender_name==use){
+        if(element.sender_name==use&&!element.is_update){
             renderMessage("mine",{
                 name:element.sender_name,
+                text:element.content
+                
+            })
+            
+        }
+        else if(element.is_update&&element.sender_name!=use){
+            existingUpdate({
+                name:element.sender_name,
+                text:element.content
+            })
+        }
+        else if(element.is_update&&element.sender_name==use){
+            existingUpdate({
+                name:'you',
                 text:element.content
             })
         }
@@ -206,14 +226,24 @@ socket.on("existingMessages",function(message){
         }
        
     })
-    
- 
+    renderMessage("updateOfMine");
+
 })
 
+function existingUpdate(update){
+    let containeMessage=document.getElementById("message_container")
+let el=document.createElement("div");
+el.setAttribute("id","update");
+el.innerText=update.name+" "+update.text;
+containeMessage.appendChild(el);
+}
 socket.on("userList",function(name){
    renderUserList(name);
 })
 socket.on("update",function(update){
+    renderMessage("update",update);
+})
+socket.on("updateList",function(update){
     renderMessage("update",update);
 })
 socket.on("typing",function(message){

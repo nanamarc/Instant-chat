@@ -67,7 +67,7 @@ width: 100%;
     overflow-y: auto;
 }
 
-.app input{
+#txt{
     outline: none;
     width: 70%;
     border-radius: 15px;
