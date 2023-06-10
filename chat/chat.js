@@ -20,16 +20,17 @@ const today=new Date;
 
 
 //Theme dark and light
-   // var mode=document.getElementById("mode")
+   var mode=document.getElementById("mode")
 
-/*mode.addEventListener("click",function(){
+mode.addEventListener("click",function(){
+   var all=document.querySelector("main")
     var cont=document.getElementById("container");
     var roomCont=document.getElementById("room_cont")
     cont.classList.toggle("black")
     messageContainer.classList.toggle("sombre")
-    join.classList.toggle("sombre")
+   
     if(messageContainer.classList.contains("sombre")){
-        messageContainer.style.color="white"
+        cont.style.color="white"
         mode.innerHTML=`<img src="image/soleil.png" alt="">`
         
 
@@ -37,13 +38,13 @@ const today=new Date;
    
     else{
         messageContainer.style.color="black"
-        /*roomCont.style.color="black"*/
-       // mode.innerHTML=`<img src="image/icons8-lune-91.png" alt="">`
-  /*  }
+        cont.style.color="black"
+        mode.innerHTML=`<img src="image/icons8-lune-91.png" alt="">`
+    }
   
 
 
-})*/
+})
 
 
 //joining room
@@ -123,6 +124,7 @@ function renderMessage(type,msg){
         el.innerHTML=`
         <div class="sender_name">you</div>
         <div class="sending">${msg.text}</div>
+    
   
         `
         containeMessage.appendChild(el)
@@ -134,6 +136,7 @@ function renderMessage(type,msg){
         el.innerHTML=`
         <div class="sender_name">${msg.name}</div>
         <div class="sending">${msg.text}</div>
+        
         `
         
    
@@ -182,9 +185,9 @@ function renderUserList(users){
     let userList=document.getElementById("all_users")
     userList.innerHTML=""
     users.forEach(element => {
-       let element=document.createElement("div");
-       element.innerText=element;
-       userList.appendChild(element) 
+       let a=document.createElement("div");
+       a.innerText=element;
+       userList.appendChild(a) 
     });
    
 }
@@ -203,6 +206,7 @@ socket.on("existingMessages",function(message){
                 name:element.sender_name,
                 text:element.content
                 
+                
             })
             
         }
@@ -215,7 +219,7 @@ socket.on("existingMessages",function(message){
         else if(element.is_update&&element.sender_name==use){
             existingUpdate({
                 name:'you',
-                text:element.content
+                text:"you have joined the chat"
             })
         }
         else{

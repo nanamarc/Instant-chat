@@ -131,7 +131,7 @@ socket.on("leave",function(username){
 })
 
 
-let port=876
+let port=3001
 server.listen(port,()=>{
     console.log("listen to port"+port)
     

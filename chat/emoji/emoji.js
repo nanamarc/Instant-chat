@@ -7825,7 +7825,7 @@ const EmojiPicker = function(options) {
             if(obj.left < 0)
                 obj.left = 10
 
-
+                obj.top+=6000;
             return obj;
 
         },

@@ -7,5 +7,5 @@ new EmojiPicker({
     ],
     closeButton: true,
     dragButton: true,
-  
+  postion:'bottom'
 });
