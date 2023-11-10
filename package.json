@@ -12,7 +12,6 @@
   "dependencies": {
     "emoji-mart": "^5.5.2",
     "express": "^4.18.2",
-    "mongodb": "^5.5.0",
     "mongoose": "^7.2.2",
     "pg": "^8.11.0",
     "socket.io": "^4.6.1"
