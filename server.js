@@ -1,141 +1,219 @@
-const { log, error } = require("console");
-const express=require("express");
-const path=require("path");
-const { Socket } = require("socket.io");
-const app=express();
-const server=require("http").createServer(app);
-const io=require("socket.io")(server);
-const { Pool }=require("pg")
-const pool=new Pool({
-    host:'localhost',
-    port:5432,
-    database:'chat',
-    user:'postgres',
-    password:'postgres'
+const express = require("express");
+const path = require("path");
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const { Pool } = require("pg");
+
+const app = express();
+const server = createServer(app);
+const io = new Server(server);
+
+// Database configuration
+const pool = new Pool({
+    host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT || 5432,
+    database: process.env.DB_NAME || 'chat',
+    user: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD || 'postgres'
 });
-//current date
-const today = new Date();
 
-let dateTime=`${today.getFullYear()}-${today.getMonth()}-${today.getDate()} ${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`
+// Serve static files
+app.use(express.static(path.join(__dirname, 'public')));
 
+// Global variables
+const globalRoom = "global";
+const userList = {};
 
-app.use(express.static(path.join(__dirname, 'chat')));
-let globalRoom="global"
-let userList={};
-io.on("connection",function(socket){
+// Utility functions
+const getCurrentDateTime = () => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+};
 
-   
+const sanitizeInput = (input) => {
+    return input.replace(/[<>]/g, '');
+};
 
-let currentRoom;
-let name;
-//join a room
-socket.on("login",function(data){
-    var username=data.username
-    let  room=data.room 
- userList[socket.id]=username;
-    if(room=="")
-        currentRoom=globalRoom
-    else
-    currentRoom=room;
-   
-    socket.join(currentRoom)
- 
-    console.log(username+" is connected to the room "+currentRoom)
-    console.table(userList )
-
-    io.to(currentRoom).emit("userList",Object.values(userList))
-  
-    name=username; 
-
-
-//database
-//printing all previous messages
-const selectQuery='select sender_name,content,is_update,date from messages where room_name=$1'
-const value=[currentRoom]
-pool.query(selectQuery,value,(err,result)=>{
-    if(err)
-    console.log(err)
-    if(result){
-        const message=result.rows;
-        socket.emit("existingMessages",message);
-        console.log(message);
+// Database functions
+const saveMessage = async (roomName, senderName, content, isUpdate = false) => {
+    try {
+        const query = 'INSERT INTO messages(room_name, sender_name, content, date, is_update) VALUES($1, $2, $3, $4, $5)';
+        const values = [roomName, senderName, content, getCurrentDateTime(), isUpdate];
+        await pool.query(query, values);
+        console.log('Message saved to database');
+    } catch (error) {
+        console.error('Database error:', error);
     }
+};
+
+const getMessages = async (roomName) => {
+    try {
+        const query = 'SELECT sender_name, content, is_update, date FROM messages WHERE room_name = $1 ORDER BY id ASC';
+        const result = await pool.query(query, [roomName]);
+        return result.rows;
+    } catch (error) {
+        console.error('Database error:', error);
+        return [];
+    }
+};
+
+// Socket.IO connection handling
+io.on("connection", (socket) => {
+    console.log(`User connected: ${socket.id}`);
     
-})
+    let currentRoom;
+    let username;
 
+    // Handle user login
+    socket.on("login", async (data) => {
+        try {
+            username = sanitizeInput(data.username);
+            const room = sanitizeInput(data.room) || globalRoom;
+            
+            userList[socket.id] = username;
+            currentRoom = room;
+            
+            // Join the room
+            socket.join(currentRoom);
+            
+            console.log(`${username} joined room: ${currentRoom}`);
+            console.table(userList);
+            
+            // Send user list to all users in the room
+            const roomUsers = Object.entries(userList)
+                .filter(([socketId]) => {
+                    const userSocket = io.sockets.sockets.get(socketId);
+                    return userSocket && Array.from(userSocket.rooms).includes(currentRoom);
+                })
+                .map(([, user]) => user);
+            
+            io.to(currentRoom).emit("userList", roomUsers);
+            
+            // Send existing messages to the user
+            const messages = await getMessages(currentRoom);
+            socket.emit("existingMessages", messages);
+            
+        } catch (error) {
+            console.error('Login error:', error);
+            socket.emit('error', 'Failed to join room');
+        }
+    });
 
-    
+    // Handle user update (join notification)
+    socket.on("update", async (data) => {
+        try {
+            const message = `${username} has joined room ${currentRoom}`;
+            socket.broadcast.to(currentRoom).emit("update", message);
+            await saveMessage(currentRoom, username, 'has joined the room', true);
+        } catch (error) {
+            console.error('Update error:', error);
+        }
+    });
 
-})
+    // Handle typing indicators
+    socket.on("typing", (data) => {
+        const message = `${sanitizeInput(data)} is typing...`;
+        socket.broadcast.to(currentRoom).emit("typing", message);
+    });
 
-socket.on("update",function(data){
-    socket.broadcast.to(currentRoom).emit("update",data.username+ " has joined room "+currentRoom)
-    const insert='insert into messages(room_name,sender_name,content,is_update) values($1,$2,$3,$4)'
-    const values=[currentRoom,name,'has joined the room',true];
-    pool.query(insert,values,(err,result)=>
-    {
-        if(err)
-        console.log(err)
-        if(result)
-        console.log("enregistré");
-    })
- 
-})
+    socket.on("stopTyping", () => {
+        socket.broadcast.to(currentRoom).emit("stopTyping");
+    });
 
+    // Handle chat messages
+    socket.on("chat", async (message) => {
+        try {
+            const sanitizedMessage = {
+                name: sanitizeInput(message.name),
+                text: sanitizeInput(message.text),
+                dateTime: message.dateTime
+            };
+            
+            // Broadcast to other users in the room
+            socket.broadcast.to(currentRoom).emit("chat", sanitizedMessage);
+            
+            // Save to database
+            await saveMessage(currentRoom, username, sanitizedMessage.text);
+            
+        } catch (error) {
+            console.error('Chat error:', error);
+        }
+    });
 
+    // Handle user leaving
+    socket.on("leave", async (leavingUsername) => {
+        try {
+            const message = `${sanitizeInput(leavingUsername)} has left the conversation`;
+            socket.broadcast.to(currentRoom).emit("leave", message);
+            
+            // Remove from user list
+            delete userList[socket.id];
+            
+            // Update user list for remaining users
+            const roomUsers = Object.entries(userList)
+                .filter(([socketId]) => {
+                    const userSocket = io.sockets.sockets.get(socketId);
+                    return userSocket && Array.from(userSocket.rooms).includes(currentRoom);
+                })
+                .map(([, user]) => user);
+            
+            io.to(currentRoom).emit("userList", roomUsers);
+            
+            // Save leave message to database
+            await saveMessage(currentRoom, username, "has left the conversation", true);
+            
+            console.log(`${leavingUsername} disconnected`);
+            console.table(userList);
+            
+        } catch (error) {
+            console.error('Leave error:', error);
+        }
+    });
 
-//Notify others when an user is typing
-socket.on("typing",function(data){
-  
-    socket.broadcast.to(currentRoom).emit("typing",data+" est en train d'ecrire...")
-})
+    // Handle disconnection
+    socket.on("disconnect", async () => {
+        try {
+            if (username && currentRoom) {
+                const message = `${username} has left the conversation`;
+                socket.broadcast.to(currentRoom).emit("leave", message);
+                
+                // Remove from user list
+                delete userList[socket.id];
+                
+                // Update user list for remaining users
+                const roomUsers = Object.entries(userList)
+                    .filter(([socketId]) => {
+                        const userSocket = io.sockets.sockets.get(socketId);
+                        return userSocket && Array.from(userSocket.rooms).includes(currentRoom);
+                    })
+                    .map(([, user]) => user);
+                
+                io.to(currentRoom).emit("userList", roomUsers);
+                
+                // Save disconnect message to database
+                await saveMessage(currentRoom, username, "has left the conversation", true);
+                
+                console.log(`${username} disconnected`);
+                console.table(userList);
+            }
+        } catch (error) {
+            console.error('Disconnect error:', error);
+        }
+    });
+});
 
-socket.on("stopTyping",function(){
-    socket.broadcast.to(currentRoom).emit("stopTyping")
-})
+// Error handling
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+});
 
-// Send message to all connected users
-socket.on("chat",function(message){
-  
- socket.broadcast.to(currentRoom).emit("chat",message);
-      //adding all messages to the database
-const insert='insert into messages(room_name,sender_name,content,"date") values($1,$2,$3,$4)'
-const values=[currentRoom,name,message.text,dateTime]
-pool.query(insert,values,(err,result)=>{
-    if(err)
-    console.log("erreur:",err)
-    else 
-    console.log('message enrgistré');
-})
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
 
-    
-})
-
-//leave the room
-socket.on("leave",function(username){
-    socket.leave(currentRoom);
-    socket.broadcast.to(currentRoom).emit("leave",username+"has left the conversation")
-    delete userList[socket.id]
-    io.to(currentRoom).emit("userList",Object.values(userList))
-    console.log(username+"has desconnected");
-    console.table(userList)
-    
-    const insert='insert into messages(room_name,sender_name,content,is_update) values($1,$2,$3,$4)'
-    const values=[currentRoom,name,"has left the conversation",true];
-    pool.query(insert,values,(err,result)=>{
-        if(err)
-        console.log("erreur:"+err);
-        else 
-        console.log("enregistré");
-    })
- })
-
-
-})
-
-
-let port=3009
-server.listen(port,()=>{
-    console.log("listen to port"+port)
-    
+// Start server
+const PORT = process.env.PORT || 3009;
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Visit http://localhost:${PORT} to access the chat`);
 });
